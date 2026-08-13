@@ -1,0 +1,12 @@
+{
+    "dataset_reviews": 1081093,
+    "dataset_books": 66827,
+    "minimum_reviews": 50,
+    "eligible_books": 2956,
+    "positive_interaction_ratio_pct": 80.72,
+    "average_eligible_book_rating": 4.189,
+    "top_book": "The Hobbit",
+    "top_book_rating": 4.68,
+    "top_book_review_count": 18222,
+    "top_book_weighted_score": 19.94
+}
