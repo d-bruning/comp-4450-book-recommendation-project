@@ -1,0 +1,10 @@
+aliases:
+  archived: '1'
+  production: '4'
+  staging: '3'
+  test: '2'
+creation_timestamp: 1786643157596
+description: Item-based collaborative filtering recommender using scikit-learn NearestNeighbors
+  and cosine similarity.
+last_updated_timestamp: 1786645289372
+name: book-recommender-knn

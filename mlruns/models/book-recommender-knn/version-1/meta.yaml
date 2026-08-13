@@ -1,0 +1,27 @@
+aliases:
+- production
+creation_timestamp: 1786643157607
+current_stage: None
+description: 'Training Dataset:
+
+  books_ratings_5core_v1
+
+
+  Positive Interaction Threshold:
+
+  4 stars
+
+
+  Minimum Book Reviews:
+
+  20'
+last_updated_timestamp: 1786644950574
+name: book-recommender-knn
+run_id: 5b920c4a310848b5b93a6460be8ae150
+run_link: null
+source: file:///C:/Users/Daniel.Bruning/Courses/git-repo/comp-4450-book-recommendation-project/mlruns/420598907514379095/5b920c4a310848b5b93a6460be8ae150/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///C:/Users/Daniel.Bruning/Courses/git-repo/comp-4450-book-recommendation-project/mlruns/420598907514379095/5b920c4a310848b5b93a6460be8ae150/artifacts/model
+user_id: null
+version: 1
