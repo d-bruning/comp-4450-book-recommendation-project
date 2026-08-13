@@ -15,6 +15,7 @@ data/processed/*
 # Models
 models/*
 !models/.gitkeep
+models/*.csv
 
 # W&B
 wandb/
