@@ -1,0 +1,10 @@
+numpy
+pandas
+scikit-learned
+wandb
+fastapi
+uvicorn
+streamlit
+boto3
+pytest
+ruff
