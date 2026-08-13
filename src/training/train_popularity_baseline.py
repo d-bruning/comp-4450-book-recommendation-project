@@ -1,13 +1,14 @@
 from pathlib import Path
 import json
+import subprocess
+
+import mlflow
 import numpy as np
 import pandas as pd
 
-# --------------------------------------------------
+# ============================================================
 # Configuration
-# --------------------------------------------------
-
-from pathlib import Path
+# ============================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -33,169 +34,270 @@ METRICS_OUTPUT = (
 
 MIN_REVIEWS = 50
 
-# --------------------------------------------------
-# Create Output Directories
-# --------------------------------------------------
+EXPERIMENT_NAME = "COMP4450 Book Recommender"
+RUN_NAME = "popularity_baseline_v1"
+DATASET_VERSION = "books_ratings_5core_v1"
 
-Path(
-    PROJECT_ROOT
-    / "models"
-).mkdir(exist_ok=True)
+# ============================================================
+# Helpers
+# ============================================================
 
-Path(
-    PROJECT_ROOT
-    / "artifacts"
-    / "reports"
-).mkdir(
+def get_git_commit():
+    try:
+        return (
+            subprocess.check_output(
+                ["git", "rev-parse", "HEAD"]
+            )
+            .decode("utf-8")
+            .strip()
+        )
+    except Exception:
+        return "unknown"
+
+# ============================================================
+# Directories
+# ============================================================
+
+MODEL_OUTPUT.parent.mkdir(
     parents=True,
     exist_ok=True
 )
 
-# --------------------------------------------------
-# Load Dataset
-# --------------------------------------------------
-
-print("Loading dataset...")
-
-df = pd.read_csv(
-    INPUT_FILE,
-    usecols=[
-        "Title",
-        "review/score"
-    ]
+METRICS_OUTPUT.parent.mkdir(
+    parents=True,
+    exist_ok=True
 )
 
-print(f"Loaded {len(df):,} reviews")
+# ============================================================
+# MLflow
+# ============================================================
 
-# --------------------------------------------------
-# Aggregate Book Statistics
-# --------------------------------------------------
+mlflow.set_experiment(EXPERIMENT_NAME)
+print("Starting MLflow run...")
 
-print("Calculating book statistics...")
+with mlflow.start_run(run_name=RUN_NAME):
 
-book_stats = (
-    df.groupby("Title")
-    .agg(
-        avg_rating=("review/score", "mean"),
-        review_count=("review/score", "count")
+    mlflow.log_params(
+        {
+            "model_type": "popularity_baseline",
+            "minimum_reviews": MIN_REVIEWS,
+            "dataset_version": DATASET_VERSION,
+            "git_commit": get_git_commit(),
+        }
     )
-    .reset_index()
-)
 
-# --------------------------------------------------
-# Apply Minimum Review Threshold
-# --------------------------------------------------
+    # ============================================================
+    # Load Dataset
+    # ============================================================
 
-book_stats = book_stats[
-    book_stats["review_count"] >= MIN_REVIEWS
-]
+    print("Loading dataset...")
 
-print(
-    f"Eligible books: "
-    f"{len(book_stats):,}"
-)
+    df = pd.read_csv(
+        INPUT_FILE,
+        usecols=[
+            "Title",
+            "review/score"
+        ]
+    )
 
-# --------------------------------------------------
-# Weighted Popularity Score
-# --------------------------------------------------
+    print(f"Loaded {len(df):,} reviews")
 
-book_stats["weighted_score"] = (
-    book_stats["avg_rating"]
-    * np.log10(book_stats["review_count"])
-)
+    # ============================================================
+    # Aggregate Statistics
+    # ============================================================
 
-# --------------------------------------------------
-# Ranking
-# --------------------------------------------------
+    print("Calculating book statistics...")
 
-book_stats = book_stats.sort_values(
-    by="weighted_score",
-    ascending=False
-)
+    book_stats = (
+        df.groupby("Title")
+          .agg(
+              avg_rating=("review/score", "mean"),
+              review_count=("review/score", "count"),
+              positive_reviews=(
+                  "review/score",
+                  lambda x: (x >= 4).sum()
+              )
+          )
+          .reset_index()
+    )
 
-book_stats["rank"] = (
-    range(
+    # ============================================================
+    # Filter
+    # ============================================================
+
+    book_stats = book_stats[
+        book_stats["review_count"] >= MIN_REVIEWS
+    ]
+
+    print(
+        f"Eligible books: {len(book_stats):,}"
+    )
+
+    # ============================================================
+    # Additional Metrics
+    # ============================================================
+
+    total_reviews = len(df)
+
+    book_stats["positive_pct"] = (
+        (
+            book_stats["positive_reviews"]
+            / book_stats["review_count"]
+        ) * 100
+    )
+
+    book_stats["review_pct"] = (
+        (
+            book_stats["review_count"]
+            / total_reviews
+        ) * 100
+    )
+
+    # ============================================================
+    # Weighted Score
+    # ============================================================
+
+    book_stats["weighted_score"] = (
+        book_stats["avg_rating"]
+        * np.log10(book_stats["review_count"])
+    )
+
+    # ============================================================
+    # Formatting
+    # ============================================================
+
+    book_stats["avg_rating"] = (
+        book_stats["avg_rating"].round(3)
+    )
+
+    book_stats["positive_pct"] = (
+        book_stats["positive_pct"].round(2)
+    )
+
+    book_stats["review_pct"] = (
+        book_stats["review_pct"].round(4)
+    )
+
+    book_stats["weighted_score"] = (
+        book_stats["weighted_score"].round(3)
+    )
+
+    # ============================================================
+    # Ranking
+    # ============================================================
+
+    book_stats = book_stats.sort_values(
+        by="weighted_score",
+        ascending=False
+    )
+
+    book_stats["rank"] = range(
         1,
         len(book_stats) + 1
     )
-)
 
-# Reorder columns
-
-book_stats = book_stats[
-    [
-        "rank",
-        "Title",
-        "avg_rating",
-        "review_count",
-        "weighted_score"
+    book_stats = book_stats[
+        [
+            "rank",
+            "Title",
+            "avg_rating",
+            "review_count",
+            "positive_reviews",
+            "positive_pct",
+            "review_pct",
+            "weighted_score"
+        ]
     ]
-]
 
-# --------------------------------------------------
-# Save Model Artifact
-# --------------------------------------------------
+    # ============================================================
+    # Save Model
+    # ============================================================
 
-book_stats.to_csv(
-    MODEL_OUTPUT,
-    index=False
-)
-
-print(
-    f"Model saved to: "
-    f"{MODEL_OUTPUT}"
-)
-
-# --------------------------------------------------
-# Generate Metrics Report
-# --------------------------------------------------
-
-metrics = {
-    "dataset_reviews": int(len(df)),
-    "dataset_books": int(df["Title"].nunique()),
-    "minimum_reviews": int(MIN_REVIEWS),
-    "eligible_books": int(len(book_stats)),
-    "average_rating": float(
-        round(
-            book_stats["avg_rating"].mean(),
-            4
-        )
-    ),
-    "top_book": str(
-        book_stats.iloc[0]["Title"]
-    ),
-    "top_book_rating": float(
-        round(
-            book_stats.iloc[0]["avg_rating"],
-            4
-        )
-    )
-}
-
-with open(
-    METRICS_OUTPUT,
-    "w"
-) as f:
-    json.dump(
-        metrics,
-        f,
-        indent=4
-    )
-
-print(
-    f"Metrics saved to: "
-    f"{METRICS_OUTPUT}"
-)
-
-# --------------------------------------------------
-# Preview Top 20
-# --------------------------------------------------
-
-print("\nTop 20 Books")
-print("-" * 80)
-
-print(
-    book_stats.head(20).to_string(
+    book_stats.to_csv(
+        MODEL_OUTPUT,
         index=False
     )
-)
+
+    mlflow.log_artifact(
+        str(MODEL_OUTPUT)
+    )
+
+    # ============================================================
+    # Metrics
+    # ============================================================
+
+    positive_interactions = (
+        df["review/score"] >= 4
+    ).sum()
+
+    metrics = {
+        "dataset_reviews": int(len(df)),
+        "dataset_books": int(df["Title"].nunique()),
+        "eligible_books": int(len(book_stats)),
+        "positive_interaction_ratio_pct": round(
+            (
+                positive_interactions
+                / len(df)
+            ) * 100,
+            2
+        ),
+
+        # New metrics
+        "top_book_rating": float(
+            book_stats.iloc[0]["avg_rating"]
+        ),
+
+        "top_book_review_count": int(
+            book_stats.iloc[0]["review_count"]
+        ),
+
+        "top_book_weighted_score": float(
+            book_stats.iloc[0]["weighted_score"]
+        ),
+
+        "avg_weighted_score": round(
+            float(
+                book_stats["weighted_score"].mean()
+            ),
+            3
+        ),
+
+        "max_weighted_score": round(
+            float(
+                book_stats["weighted_score"].max()
+            ),
+            3
+        )
+    }
+
+    print("Logging metrics...")
+    mlflow.log_metrics(metrics)
+
+    report = {
+        **metrics,
+        "top_book": book_stats.iloc[0]["Title"],
+        "top_book_rating": float(
+            book_stats.iloc[0]["avg_rating"]
+        ),
+        "top_book_review_count": int(
+            book_stats.iloc[0]["review_count"]
+        ),
+    }
+
+    with open(
+        METRICS_OUTPUT,
+        "w",
+        encoding="utf-8"
+    ) as f:
+        json.dump(
+            report,
+            f,
+            indent=4
+        )
+
+    print("Logging artifacts...")
+    mlflow.log_artifact(
+        str(METRICS_OUTPUT)
+    )
+
+print("Baseline training complete.")

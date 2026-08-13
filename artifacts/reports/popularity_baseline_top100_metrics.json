@@ -1,0 +1,10 @@
+{
+    "top_n": 100,
+    "books_in_output": 100,
+    "top_book": "The Hobbit",
+    "top_book_rating": 4.68,
+    "top_book_review_count": 18222,
+    "top_book_weighted_score": 19.94,
+    "avg_rating_top100": 4.464,
+    "avg_weighted_score_top100": 14.472
+}
