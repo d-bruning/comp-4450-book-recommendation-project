@@ -119,6 +119,8 @@ def cache_prediction(
     favorite_book,
     recommendations
 ):
+    if recommendations is None:
+        return
 
     try:
 

@@ -1,0 +1,34 @@
+.git
+.github
+
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+.vscode
+
+.env
+
+wandb
+mlruns
+
+logs
+
+tests
+
+# Raw data
+data/raw/Books_rating.csv
+
+# Training data
+data/processed/*.csv
+
+# Training artifacts not needed in runtime containers
+artifacts/
+
+# Optional: MLflow local storage
+mlruns/
+
+# Optional: notebooks
+*.ipynb

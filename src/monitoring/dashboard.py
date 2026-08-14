@@ -270,12 +270,13 @@ if cache_data:
             }
             for book, recommendations
             in cache_data.items()
+            if recommendations is not None
         ]
     )
 
     st.dataframe(
         cache_df,
-        use_container_width=True
+        width="stretch"
     )
 
 else:
@@ -296,9 +297,14 @@ if not log_df.empty:
 
     recent_df[
         "recommendation_count"
-    ] = recent_df[
-        "recommendations"
-    ].apply(len)
+    ] = (
+        recent_df["recommendations"]
+        .apply(
+            lambda x: len(x)
+            if isinstance(x, list)
+            else 0
+        )
+    )
 
     recent_df = recent_df[
         [
@@ -315,7 +321,7 @@ if not log_df.empty:
 
     st.dataframe(
         recent_df.head(20),
-        use_container_width=True
+        width="stretch"
     )
 
 else:
@@ -334,9 +340,14 @@ with st.expander(
 
     if not log_df.empty:
 
+        display_df = log_df.drop(
+            columns=["recommendations"],
+            errors="ignore"
+        )
+
         st.dataframe(
-            log_df,
-            use_container_width=True
+            display_df,
+            width="stretch"
         )
 
     else:

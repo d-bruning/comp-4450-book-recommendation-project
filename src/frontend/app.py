@@ -2,12 +2,15 @@ import streamlit as st
 import requests
 from pathlib import Path
 import joblib
-
+import os
 # ============================================================
 # Configuration
 # ============================================================
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv(
+    "API_URL",
+    "http://127.0.0.1:8000"
+)
 
 DEFAULT_IMAGE = (
     "https://upload.wikimedia.org/"
