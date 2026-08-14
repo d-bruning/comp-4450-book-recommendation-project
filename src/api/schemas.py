@@ -7,6 +7,7 @@ class RecommendationRequest(BaseModel):
 class BookRecommendation(BaseModel):
     title: str
     author: str
+    image: str | None = None
 
 class RecommendationResponse(BaseModel):
     favorite_book: str

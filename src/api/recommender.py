@@ -29,7 +29,7 @@ METADATA_FILE = (
 
 metadata_df = pd.read_csv(
     METADATA_FILE,
-    usecols=["Title", "authors"]
+    usecols=["Title","authors","image"]
 )
 
 def clean_authors(value):
@@ -61,15 +61,22 @@ metadata_df["authors"] = (
 author_lookup = (
     metadata_df
     .drop_duplicates("Title")
-    .set_index("Title")["authors"]
-    .to_dict()
+    .set_index("Title")
+    .to_dict("index")
+)
+
+metadata_lookup = (
+    metadata_df
+    .drop_duplicates("Title")
+    .set_index("Title")
+    .to_dict("index")
 )
 
 model = joblib.load(MODEL_FILE)
 book_index = joblib.load(BOOK_INDEX_FILE)
 
 book_lookup = {
-    title: idx
+    title.lower(): idx
     for idx, title in enumerate(book_index)
 }
 
@@ -98,14 +105,19 @@ def normalize_title(title: str) -> str:
 
     return title.strip()
 
+
+
+
 def get_recommendations(
     book_title: str,
     n: int = 10
 ):
-    if book_title not in book_lookup:
+    lookup_title = book_title.lower()
+
+    if lookup_title not in book_lookup:
         return None
 
-    idx = book_lookup[book_title]
+    idx = book_lookup[lookup_title]
 
     search_size = max(
         50,
@@ -132,13 +144,24 @@ def get_recommendations(
 
         seen.add(normalized)
 
+        metadata = metadata_lookup.get(
+            candidate,
+            {}
+        )
+
+        image = metadata.get("image")
+
+        if pd.isna(image):
+            image = None
+
         recommendations.append(
             {
                 "title": candidate,
-                "author": author_lookup.get(
-                    candidate,
+                "author": metadata.get(
+                    "authors",
                     "Unknown Author"
-                )
+                ),
+                "image": image
             }
         )
 

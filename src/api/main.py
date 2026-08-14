@@ -1,14 +1,9 @@
 from fastapi import FastAPI
 from fastapi import HTTPException
-
-from src.api.schemas import (
-    RecommendationRequest,
-    RecommendationResponse
-)
-
-from src.api.recommender import (
-    get_recommendations
-)
+from src.api.schemas import RecommendationRequest, RecommendationResponse
+from src.api.recommender import get_recommendations
+from src.api.logging_service import log_prediction
+from src.api.cache_service import get_cached_prediction, cache_prediction
 
 app = FastAPI(
     title="Book Recommender API",
@@ -31,10 +26,38 @@ def health_check():
 def predict(
     request: RecommendationRequest
 ):
+    cached = get_cached_prediction(
+        request.favorite_book
+    )
+
+    if cached is not None:
+
+        log_prediction(
+            request.favorite_book,
+            cached,
+            cache_hit=True
+        )
+
+        return {
+            "favorite_book":
+                request.favorite_book,
+            "recommendations":
+                cached
+        }
 
     recommendations = get_recommendations(
         request.favorite_book,
         request.n_recommendations
+    )
+
+    log_prediction(
+        request.favorite_book,
+        recommendations
+    )
+
+    cache_prediction(
+        request.favorite_book,
+        recommendations
     )
 
     if recommendations is None:

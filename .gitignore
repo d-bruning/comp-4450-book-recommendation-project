@@ -39,3 +39,13 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# MLruns
+mlruns/
+
+# wandb
+wandb/
+
+# logs
+logs/*.jsonl
+logs/*.json

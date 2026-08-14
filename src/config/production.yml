@@ -1,0 +1,8 @@
+environment: production
+
+storage:
+  provider: dynamodb
+
+dynamodb:
+  prediction_table: prediction-history
+  cache_table: recommendation-cache

@@ -1,7 +1,7 @@
 numpy
 pandas
 scikit-learned
-mlflow==2.17.2
+wandb
 fastapi
 uvicorn
 streamlit
