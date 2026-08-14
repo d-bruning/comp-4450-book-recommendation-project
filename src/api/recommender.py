@@ -26,8 +26,32 @@ METADATA_FILE = (
     / "books_data.csv"
 )
 
-
 metadata_lookup = {}
+
+model = None
+book_index = []
+book_lookup = {}
+
+def clean_authors(value):
+    if pd.isna(value):
+        return "Unknown Author"
+
+    try:
+        parsed = ast.literal_eval(value)
+
+        if isinstance(parsed, list):
+
+            # keep legitimate author lists
+            if len(parsed) <= 3:
+                return ", ".join(parsed)
+
+            # likely contributor explosion
+            return ", ".join(parsed[:3]) + "..."
+
+    except Exception:
+        pass
+
+    return str(value)
 
 if METADATA_FILE.exists():
 
@@ -52,49 +76,6 @@ if METADATA_FILE.exists():
         .to_dict("index")
     )
 
-def clean_authors(value):
-    if pd.isna(value):
-        return "Unknown Author"
-
-    try:
-        parsed = ast.literal_eval(value)
-
-        if isinstance(parsed, list):
-
-            # keep legitimate author lists
-            if len(parsed) <= 3:
-                return ", ".join(parsed)
-
-            # likely contributor explosion
-            return ", ".join(parsed[:3]) + "..."
-
-    except Exception:
-        pass
-
-    return str(value)
-
-metadata_df["authors"] = (
-    metadata_df["authors"]
-    .apply(clean_authors)
-)
-
-author_lookup = (
-    metadata_df
-    .drop_duplicates("Title")
-    .set_index("Title")
-    .to_dict("index")
-)
-
-metadata_lookup = (
-    metadata_df
-    .drop_duplicates("Title")
-    .set_index("Title")
-    .to_dict("index")
-)
-
-model = None
-book_index = []
-book_lookup = {}
 
 if (
     MODEL_FILE.exists()
@@ -115,10 +96,6 @@ if (
         in enumerate(book_index)
     }
 
-book_lookup = {
-    title.lower(): idx
-    for idx, title in enumerate(book_index)
-}
 
 def normalize_title(title: str) -> str:
     title = title.lower()
