@@ -27,10 +27,30 @@ METADATA_FILE = (
 )
 
 
-metadata_df = pd.read_csv(
-    METADATA_FILE,
-    usecols=["Title","authors","image"]
-)
+metadata_lookup = {}
+
+if METADATA_FILE.exists():
+
+    metadata_df = pd.read_csv(
+        METADATA_FILE,
+        usecols=[
+            "Title",
+            "authors",
+            "image"
+        ]
+    )
+
+    metadata_df["authors"] = (
+        metadata_df["authors"]
+        .apply(clean_authors)
+    )
+
+    metadata_lookup = (
+        metadata_df
+        .drop_duplicates("Title")
+        .set_index("Title")
+        .to_dict("index")
+    )
 
 def clean_authors(value):
     if pd.isna(value):
@@ -72,8 +92,28 @@ metadata_lookup = (
     .to_dict("index")
 )
 
-model = joblib.load(MODEL_FILE)
-book_index = joblib.load(BOOK_INDEX_FILE)
+model = None
+book_index = []
+book_lookup = {}
+
+if (
+    MODEL_FILE.exists()
+    and BOOK_INDEX_FILE.exists()
+):
+
+    model = joblib.load(
+        MODEL_FILE
+    )
+
+    book_index = joblib.load(
+        BOOK_INDEX_FILE
+    )
+
+    book_lookup = {
+        title.lower(): idx
+        for idx, title
+        in enumerate(book_index)
+    }
 
 book_lookup = {
     title.lower(): idx
@@ -112,6 +152,12 @@ def get_recommendations(
     book_title: str,
     n: int = 10
 ):
+    if (
+        model is None
+        or not book_lookup
+    ):
+
+        return None
     lookup_title = book_title.lower()
 
     if lookup_title not in book_lookup:
