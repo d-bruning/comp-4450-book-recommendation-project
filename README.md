@@ -150,7 +150,7 @@ Activate:
 Windows:
 
 ```powershell
-.venv\Scriptsctivate
+.venv\Scripts\activate
 ```
 
 Install dependencies:
