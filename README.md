@@ -2,19 +2,19 @@
 
 ## Overview
 
-Get Recc'd is an end to end MLOps recommendation platform built with Scikit Learn, FastAPI, Streamlit, Docker, DynamoDB, AWS EC2, MLflow, Weights & Biases (W&B), GitHub Actions, and automated testing.
+Get Recc'd is an end-to-end MLOps recommendation platform built with Scikit Learn, FastAPI, Streamlit, Docker, DynamoDB, AWS EC2, MLflow, Weights & Biases (W&B), GitHub Actions, and automated testing as a  course project to COMP 4450 Machine Learning Operations.
 
-The system allows users to select a favorite book and receive recommendations from a KNN collaborative filtering model. The application includes:
+The application allows users to select a favorite book and receive recommendations. The application includes:
 
-- Recommendation engine
+- Recommendation engine using a KNN collaborative filtering model
 - FastAPI backend API
 - Streamlit frontend
 - Monitoring dashboard
 - Docker deployment
 - AWS EC2 hosting
 - DynamoDB persistence
-- W&B experiment tracking
-- MLflow model registry
+- W&B experiment tracking and model registry
+- MLflow testing and model registry
 - GitHub Actions CI/CD
 
 ---
@@ -431,7 +431,7 @@ The dashboard reads local JSON files in development and DynamoDB in production.
 
 # Screenshots and Evidence
 
-This section provides visual evidence of the major components of the system, including application functionality, API validation, monitoring, cloud deployment, database integration, CI/CD automation, and MLOps tooling.
+This section provides visual evidence of the major components of the system, including application functionality, API validation, monitoring, cloud deployment, database integration, CI/CD automation, and MLOps tooling per project requirements.
 
 ---
 
