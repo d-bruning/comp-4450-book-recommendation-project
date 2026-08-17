@@ -7,6 +7,7 @@ venv/
 # Data
 data/raw/*
 data/processed/*
+!data/processed/books_metadata.csv
 
 # Keep folder structure
 !data/raw/.gitkeep

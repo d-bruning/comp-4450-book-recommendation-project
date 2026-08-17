@@ -22,8 +22,8 @@ BOOK_INDEX_FILE = (
 METADATA_FILE = (
     PROJECT_ROOT
     / "data"
-    / "raw"
-    / "books_data.csv"
+    / "processed"
+    / "book_metadata.csv"
 )
 
 metadata_lookup = {}
