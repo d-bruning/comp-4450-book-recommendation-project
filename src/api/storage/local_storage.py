@@ -1,29 +1,6 @@
-from pathlib import Path
-from datetime import datetime, timezone
 import json
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-LOG_FILE = (
-    PROJECT_ROOT
-    / "logs"
-    / "prediction_logs.jsonl"
-)
-
-CACHE_FILE = (
-    PROJECT_ROOT
-    / "logs"
-    / "recommendation_cache.json"
-)
-
-LOG_FILE.parent.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-from pathlib import Path
 from datetime import datetime, timezone
-import json
+from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 

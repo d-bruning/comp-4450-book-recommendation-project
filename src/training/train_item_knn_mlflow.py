@@ -1,13 +1,12 @@
-from pathlib import Path
 import json
+from pathlib import Path
 
 import joblib
 import mlflow
+import mlflow.sklearn
 import pandas as pd
-
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
-import mlflow.sklearn
 
 from src.training.mlflow_utils import get_git_commit
 
@@ -158,7 +157,7 @@ with mlflow.start_run(run_name=RUN_NAME):
         "users_used":
             int(df["User_id"].nunique()),
         "interactions_used":
-            int(len(df))
+            len(df)
     }
 
     with open(

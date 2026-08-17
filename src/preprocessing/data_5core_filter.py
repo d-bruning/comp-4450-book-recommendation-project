@@ -1,5 +1,6 @@
-import pandas as pd
 from collections import Counter
+
+import pandas as pd
 
 INPUT_FILE = "Books_rating_trimmed.csv"
 OUTPUT_FILE = "books_ratings_5core.csv"

@@ -1,8 +1,8 @@
-from pathlib import Path
+import ast
 import re
+from pathlib import Path
 
 import joblib
-import ast
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -48,8 +48,22 @@ def clean_authors(value):
             # likely contributor explosion
             return ", ".join(parsed[:3]) + "..."
 
-    except Exception:
+    try:
+        parsed = ast.literal_eval(value)
+
+        if isinstance(parsed, list):
+
+            if len(parsed) <= 3:
+                return ", ".join(parsed)
+
+            return ", ".join(parsed[:3]) + "..."
+
+    except (
+        ValueError,
+        SyntaxError,
+    ):
         pass
+
 
     return str(value)
 
@@ -147,7 +161,7 @@ def get_recommendations(
         n * 10
     )
 
-    distances, indices = model.kneighbors(
+    _distances, indices = model.kneighbors(
         model._fit_X[idx],
         n_neighbors=search_size
     )

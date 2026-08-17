@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from src.monitoring.monitoring_service import load_prediction_logs, load_cache
+from src.monitoring.monitoring_service import load_cache, load_prediction_logs
 
 # ============================================================
 # Load Data

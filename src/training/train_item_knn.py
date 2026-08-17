@@ -1,13 +1,13 @@
-from pathlib import Path
 import json
 import subprocess
+from pathlib import Path
 
 import joblib
 import pandas as pd
-import wandb
-
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
+
+import wandb
 
 # ============================================================
 # Configuration
@@ -145,7 +145,7 @@ joblib.dump(
 metadata = {
     "books_used": int(df["Title"].nunique()),
     "users_used": int(df["User_id"].nunique()),
-    "interactions_used": int(len(df)),
+    "interactions_used": len(df),
     "min_book_reviews": MIN_BOOK_REVIEWS,
     "positive_threshold": POSITIVE_THRESHOLD
 }

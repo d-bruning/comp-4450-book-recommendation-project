@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class RecommendationRequest(BaseModel):
     favorite_book: str
     n_recommendations: int = 10

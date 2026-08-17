@@ -1,9 +1,9 @@
-from fastapi import FastAPI
-from fastapi import HTTPException
-from src.api.schemas import RecommendationRequest, RecommendationResponse
-from src.api.recommender import get_recommendations
+from fastapi import FastAPI, HTTPException
+
+from src.api.cache_service import cache_prediction, get_cached_prediction
 from src.api.logging_service import log_prediction
-from src.api.cache_service import get_cached_prediction, cache_prediction
+from src.api.recommender import get_recommendations
+from src.api.schemas import RecommendationRequest, RecommendationResponse
 
 app = FastAPI(
     title="Book Recommender API",

@@ -1,5 +1,6 @@
-from pathlib import Path
 import json
+from pathlib import Path
+
 import pandas as pd
 
 # ============================================================
@@ -109,7 +110,7 @@ with open(
 print(f"\nSaved Top {TOP_N} books:")
 print(OUTPUT_FILE)
 
-print(f"\nMetrics saved:")
+print("\nMetrics saved:")
 print(METRICS_OUTPUT)
 
 print("\nTop 10 Books")

@@ -1,9 +1,8 @@
+import re
 from pathlib import Path
 
 import joblib
-import numpy as np
 import pandas as pd
-import re
 from scipy.sparse import csr_matrix
 
 # ============================================================

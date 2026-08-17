@@ -1,6 +1,6 @@
-from pathlib import Path
 import json
 import subprocess
+from pathlib import Path
 
 import mlflow
 import numpy as np
@@ -231,9 +231,9 @@ with mlflow.start_run(run_name=RUN_NAME):
     ).sum()
 
     metrics = {
-        "dataset_reviews": int(len(df)),
+        "dataset_reviews": len(df),
         "dataset_books": int(df["Title"].nunique()),
-        "eligible_books": int(len(book_stats)),
+        "eligible_books": len(book_stats),
         "positive_interaction_ratio_pct": round(
             (
                 positive_interactions
