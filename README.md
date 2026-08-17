@@ -36,7 +36,7 @@ The application allows users to select a favorite book and receive recommendatio
 13. Example User Workflow
 14. Monitoring Dashboard
 15. MLOps Components
-16. Screenshots and Evidence
+16. Screenshots
 17. Troubleshooting
 18. Technology Stack
 
@@ -442,7 +442,7 @@ This feedback loop enables ongoing evaluation of recommendation quality in produ
 
 ---
 
-# Screenshots and Evidence
+# Screenshots
 
 This section provides visual evidence of the major components of the system, including application functionality, API validation, monitoring, cloud deployment, database integration, CI/CD automation, and MLOps tooling per project requirements.
 
@@ -557,13 +557,13 @@ Verification of the deployed DynamoDB tables.
 
 <img src="docs/screenshots/dynamo_table_list.jpg" alt="DynamoDB table listing" width="500" />
 
-### Recommendation Cache Evidence
+### Recommendation Cache
 
 Evidence of cached recommendation results being persisted to DynamoDB.
 
 <img src="docs/screenshots/aws_cache_evidence.jpg" alt="DynamoDB recommendation cache records" width="500" />
 
-### Prediction History Evidence
+### Prediction History
 
 Evidence of prediction requests being logged to DynamoDB.
 
@@ -637,13 +637,13 @@ Verification of the deployed DynamoDB tables.
 
 <img src="docs/screenshots/dynamo_table_list.jpg" width="500" alt="">
 
-### Recommendation Cache Evidence
+### Recommendation Cache
 
 Evidence of cached recommendation results being persisted to DynamoDB.
 
 <img src="docs/screenshots/aws_cache_evidence.jpg" width="500" alt="">
 
-### Prediction History Evidence
+### Prediction History
 
 Evidence of prediction requests being logged to DynamoDB.
 
