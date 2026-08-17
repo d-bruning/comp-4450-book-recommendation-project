@@ -23,7 +23,7 @@ METADATA_FILE = (
     PROJECT_ROOT
     / "data"
     / "processed"
-    / "book_metadata.csv"
+    / "books_metadata.csv"
 )
 
 metadata_lookup = {}
