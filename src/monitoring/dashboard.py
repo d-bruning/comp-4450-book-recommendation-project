@@ -1,6 +1,6 @@
 from pathlib import Path
 import json
-
+import boto3
 import pandas as pd
 import streamlit as st
 
@@ -8,18 +8,17 @@ import streamlit as st
 # Configuration
 # ============================================================
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-LOG_FILE = (
-    PROJECT_ROOT
-    / "logs"
-    / "prediction_logs.jsonl"
+dynamodb = boto3.resource(
+    "dynamodb",
+    region_name="us-east-1"
 )
 
-CACHE_FILE = (
-    PROJECT_ROOT
-    / "logs"
-    / "recommendation_cache.json"
+prediction_table = dynamodb.Table(
+    "prediction-history"
+)
+
+cache_table = dynamodb.Table(
+    "recommendation-cache"
 )
 
 # ============================================================
@@ -28,62 +27,63 @@ CACHE_FILE = (
 
 def load_prediction_logs():
 
-    records = []
+    try:
 
-    if not LOG_FILE.exists():
-        return pd.DataFrame()
+        response = prediction_table.scan()
 
-    with open(
-        LOG_FILE,
-        "r",
-        encoding="utf-8"
-    ) as f:
-
-        for line in f:
-
-            line = line.strip()
-
-            if not line:
-                continue
-
-            try:
-                records.append(
-                    json.loads(line)
-                )
-
-            except json.JSONDecodeError:
-                pass
-
-    if not records:
-        return pd.DataFrame()
-
-    df = pd.DataFrame(records)
-
-    if "timestamp" in df.columns:
-
-        df["timestamp"] = pd.to_datetime(
-            df["timestamp"]
+        records = response.get(
+            "Items",
+            []
         )
 
-    return df
+        if not records:
+            return pd.DataFrame()
+
+        df = pd.DataFrame(records)
+
+        if "timestamp" in df.columns:
+
+            df["timestamp"] = pd.to_datetime(
+                df["timestamp"]
+            )
+
+        return df
+
+    except Exception as e:
+
+        st.error(
+            f"Failed to load prediction data: {e}"
+        )
+
+        return pd.DataFrame()
 
 
 def load_cache():
 
-    if not CACHE_FILE.exists():
-        return {}
-
     try:
 
-        with open(
-            CACHE_FILE,
-            "r",
-            encoding="utf-8"
-        ) as f:
+        response = cache_table.scan()
 
-            return json.load(f)
+        items = response.get(
+            "Items",
+            []
+        )
 
-    except Exception:
+        return {
+            item["favorite_book"]:
+                item.get(
+                    "recommendations",
+                    []
+                )
+            for item in items
+        }
+
+    except Exception as e:
+
+        st.error(
+            f"Failed to load cache data: {e}"
+        )
+
         return {}
 
 
