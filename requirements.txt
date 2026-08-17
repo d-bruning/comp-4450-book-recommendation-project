@@ -9,3 +9,4 @@ boto3
 pytest
 ruff
 httpx2
+boto3

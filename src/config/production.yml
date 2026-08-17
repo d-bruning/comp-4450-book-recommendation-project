@@ -3,6 +3,12 @@ environment: production
 storage:
   provider: dynamodb
 
+aws:
+  region: us-east-1
+
 dynamodb:
   prediction_table: prediction-history
   cache_table: recommendation-cache
+
+model:
+  version: production
