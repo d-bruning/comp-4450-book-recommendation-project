@@ -462,17 +462,18 @@ Example recommendation output displaying recommended books, author metadata, and
 
 <img src="docs/screenshots/app_2.jpg" alt="Recommendation results with metadata and images" width="500" />
 
-### User Feedback
-
-Example user feedback submission through the recommendation interface. Users can provide positive or negative feedback on recommendation quality, allowing the system to collect live production feedback for monitoring and evaluation purposes.
-
-<img src="docs/screenshots/user_feedback.jpg" alt="User feedback on recommendation results." />
 
 ### AWS Frontend Deployment Verification
 
 The Streamlit frontend successfully deployed and accessible from the AWS EC2 application instance.
 
 <img src="docs/screenshots/aws_frontend_app_verify.jpg" alt="AWS deployed frontend application" width="500" />
+
+### User Feedback
+
+Example user feedback submission through the recommendation interface. Users can provide positive or negative feedback on recommendation quality, allowing the system to collect live production feedback for monitoring and evaluation purposes.
+
+<img src="docs/screenshots/user_feedback.jpg" alt="User feedback on recommendation results." />
 
 ---
 
