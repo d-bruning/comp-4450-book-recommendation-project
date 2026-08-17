@@ -33,27 +33,19 @@ book_index = []
 book_lookup = {}
 
 def clean_authors(value):
+
     if pd.isna(value):
+
         return "Unknown Author"
 
     try:
-        parsed = ast.literal_eval(value)
 
-        if isinstance(parsed, list):
-
-            # keep legitimate author lists
-            if len(parsed) <= 3:
-                return ", ".join(parsed)
-
-            # likely contributor explosion
-            return ", ".join(parsed[:3]) + "..."
-
-    try:
         parsed = ast.literal_eval(value)
 
         if isinstance(parsed, list):
 
             if len(parsed) <= 3:
+
                 return ", ".join(parsed)
 
             return ", ".join(parsed[:3]) + "..."
@@ -62,10 +54,11 @@ def clean_authors(value):
         ValueError,
         SyntaxError,
     ):
+
         pass
 
-
     return str(value)
+    
 
 if METADATA_FILE.exists():
 

@@ -10,6 +10,14 @@ class BookRecommendation(BaseModel):
     author: str
     image: str | None = None
 
+class FeedbackRequest(BaseModel):
+    favorite_book: str
+    feedback: str
+    recommendation_count: int
+
+class FeedbackResponse(BaseModel):
+    status: str
+
 class RecommendationResponse(BaseModel):
     favorite_book: str
     recommendations: list[BookRecommendation]

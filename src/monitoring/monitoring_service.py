@@ -6,8 +6,16 @@ provider = (
 
 if provider == "dynamodb":
 
-    pass
+    from src.monitoring.storage.dynamodb_monitoring_storage import (
+        load_cache,
+        load_feedback,
+        load_prediction_logs
+    )
 
 else:
 
-    pass
+    from src.monitoring.storage.local_monitoring_storage import (
+        load_cache,
+        load_feedback,
+        load_prediction_logs
+    )

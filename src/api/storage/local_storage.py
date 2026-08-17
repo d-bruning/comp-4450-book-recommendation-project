@@ -21,6 +21,12 @@ LOG_FILE.parent.mkdir(
     exist_ok=True
 )
 
+FEEDBACK_FILE = (
+    PROJECT_ROOT
+    / "logs"
+    / "feedback_logs.jsonl"
+)
+
 # Create cache file if missing
 
 if not CACHE_FILE.exists():
@@ -130,4 +136,40 @@ def cache_prediction(
             cache,
             f,
             indent=4
+        )
+
+def save_feedback(
+    favorite_book: str,
+    feedback: str,
+    recommendation_count: int
+):
+
+    feedback_record = {
+
+        "favorite_book":
+            favorite_book,
+
+        "feedback":
+            feedback,
+
+        "recommendation_count":
+            recommendation_count,
+
+        "timestamp":
+            datetime.now(
+                timezone.utc
+            ).isoformat()
+    }
+
+    with open(
+        FEEDBACK_FILE,
+        "a",
+        encoding="utf-8"
+    ) as f:
+
+        f.write(
+            json.dumps(
+                feedback_record
+            )
+            + "\n"
         )

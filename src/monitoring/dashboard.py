@@ -1,7 +1,11 @@
 import pandas as pd
 import streamlit as st
 
-from src.monitoring.monitoring_service import load_cache, load_prediction_logs
+from src.monitoring.monitoring_service import (
+    load_cache,
+    load_feedback,
+    load_prediction_logs
+)
 
 # ============================================================
 # Load Data
@@ -10,6 +14,8 @@ from src.monitoring.monitoring_service import load_cache, load_prediction_logs
 log_df = load_prediction_logs()
 
 cache_data = load_cache()
+
+feedback_df = load_feedback()
 
 # ============================================================
 # Page
@@ -48,8 +54,9 @@ unique_books = (
 cache_entries = len(cache_data)
 
 cache_hits = 0
-cache_misses = 0
+
 cache_hit_rate = 0
+
 most_requested_book = "N/A"
 
 if not log_df.empty:
@@ -61,11 +68,6 @@ if not log_df.empty:
     cache_hits = (
         log_df["cache_hit"]
         .sum()
-    )
-
-    cache_misses = (
-        len(log_df)
-        - cache_hits
     )
 
     if len(log_df) > 0:
@@ -85,10 +87,43 @@ if not log_df.empty:
     )
 
 # ============================================================
+# Feedback Metrics
+# ============================================================
+
+total_feedback = (
+    len(feedback_df)
+    if not feedback_df.empty
+    else 0
+)
+
+positive_feedback = 0
+
+positive_feedback_rate = 0
+
+if not feedback_df.empty:
+
+    positive_feedback = (
+        len(
+            feedback_df[
+                feedback_df["feedback"]
+                == "positive"
+            ]
+        )
+    )
+
+    positive_feedback_rate = round(
+        (
+            positive_feedback
+            / len(feedback_df)
+        ) * 100,
+        1
+    )
+
+# ============================================================
 # KPI Metrics
 # ============================================================
 
-col1, col2, col3, col4, col5 = st.columns(5)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
 
@@ -114,15 +149,31 @@ with col3:
 with col4:
 
     st.metric(
-        "Most Requested Book",
-        most_requested_book
+        "Cached Books",
+        cache_entries
     )
+
+col5, col6, col7 = st.columns(3)
 
 with col5:
 
     st.metric(
-        "Cached Books",
-        cache_entries
+        "Most Requested Book",
+        most_requested_book
+    )
+
+with col6:
+
+    st.metric(
+        "Total Feedback",
+        total_feedback
+    )
+
+with col7:
+
+    st.metric(
+        "Positive Feedback Rate",
+        f"{positive_feedback_rate}%"
     )
 
 # ============================================================
@@ -133,7 +184,10 @@ st.subheader(
     "Prediction Volume"
 )
 
-if not log_df.empty:
+if (
+    not log_df.empty
+    and "timestamp" in log_df.columns
+):
 
     trend_df = (
         log_df
@@ -191,6 +245,31 @@ else:
     )
 
 # ============================================================
+# Feedback Distribution
+# ============================================================
+
+st.subheader(
+    "User Feedback Distribution"
+)
+
+if not feedback_df.empty:
+
+    feedback_counts = (
+        feedback_df["feedback"]
+        .value_counts()
+    )
+
+    st.bar_chart(
+        feedback_counts
+    )
+
+else:
+
+    st.info(
+        "No feedback submitted yet."
+    )
+
+# ============================================================
 # Cache Summary
 # ============================================================
 
@@ -203,8 +282,7 @@ if cache_data:
     cache_df = pd.DataFrame(
         [
             {
-                "Book":
-                    book,
+                "Book": book,
                 "Recommendation Count":
                     len(recommendations)
             }
@@ -281,6 +359,35 @@ else:
 
     st.info(
         "No requests logged yet."
+    )
+
+# ============================================================
+# Recent Feedback
+# ============================================================
+
+st.subheader(
+    "Recent Feedback"
+)
+
+if not feedback_df.empty:
+
+    recent_feedback = (
+        feedback_df
+        .sort_values(
+            "timestamp",
+            ascending=False
+        )
+    )
+
+    st.dataframe(
+        recent_feedback.head(20),
+        use_container_width=True
+    )
+
+else:
+
+    st.info(
+        "No feedback submitted yet."
     )
 
 # ============================================================

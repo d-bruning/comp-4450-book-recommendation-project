@@ -393,17 +393,30 @@ Example Response:
 
 # Monitoring Dashboard
 
-Metrics:
+The monitoring dashboard provides operational visibility into the recommendation system and serves as the primary observability interface for production deployments.
 
-- Total Predictions
-- Unique Books
-- Cache Hit Rate
-- Most Requested Book
-- Cached Books
-- Prediction Volume
-- Recent Requests
+The dashboard reads from the configured storage provider:
 
-The dashboard reads local JSON files in development and DynamoDB in production.
+* Development: local JSON log files
+* Production: Amazon DynamoDB
+
+Monitored metrics include:
+
+* Total Predictions
+* Unique Books Requested
+* Cache Hit Rate
+* Cached Books
+* Most Requested Book
+* Prediction Volume Over Time
+* Top Requested Books
+* Recent Prediction Requests
+* Total Feedback
+* Positive Feedback Rate
+* User Feedback Distribution
+
+In addition to operational metrics, the dashboard supports recommendation quality monitoring through a user feedback pipeline. Users can submit positive or negative feedback on recommendation usefulness directly from the frontend application. Feedback is persisted through the application's storage layer and surfaced within the monitoring dashboard.
+
+This feedback loop enables ongoing evaluation of recommendation quality in production and provides a live measure of recommendation usefulness through the Positive Feedback Rate metric.
 
 ---
 
@@ -449,6 +462,12 @@ Example recommendation output displaying recommended books, author metadata, and
 
 <img src="docs/screenshots/app_2.jpg" alt="Recommendation results with metadata and images" width="500" />
 
+### User Feedback
+
+Example user feedback submission through the recommendation interface. Users can provide positive or negative feedback on recommendation quality, allowing the system to collect live production feedback for monitoring and evaluation purposes.
+
+<img src="docs/screenshots/user_feedback.jpg" alt="User feedback on recommendation results." />
+
 ### AWS Frontend Deployment Verification
 
 The Streamlit frontend successfully deployed and accessible from the AWS EC2 application instance.
@@ -492,6 +511,12 @@ Initial monitoring dashboard implementation using locally persisted JSON logs.
 Operational metrics, request tracking, and cache analytics during development.
 
 <img src="docs/screenshots/monitoring_2.jpg" alt="Monitoring metrics and analytics" width="500" />
+
+### User Feedback Monitoring
+
+Monitoring dashboard displaying collected user feedback and recommendation quality metrics.
+
+<img src="docs/screenshots/user_feedback_monitoring.jpg" alt="Feedback monitoring metrics and analytics" width="500" />
 
 ### DynamoDB Production Monitoring
 

@@ -14,12 +14,6 @@ API_URL = os.getenv(
     "http://127.0.0.1:8000"
 )
 
-DEFAULT_IMAGE = (
-    "https://upload.wikimedia.org/"
-    "wikipedia/commons/8/87/"
-    "Book_icon_1.svg"
-)
-
 ASSETS_DIR = (
     Path(__file__).parent
     / "assets"
@@ -43,6 +37,18 @@ book_titles = sorted(
 )
 
 # ============================================================
+# Session State
+# ============================================================
+
+if "recommendations" not in st.session_state:
+
+    st.session_state["recommendations"] = []
+
+if "favorite_book" not in st.session_state:
+
+    st.session_state["favorite_book"] = None
+
+# ============================================================
 # Page
 # ============================================================
 
@@ -52,7 +58,9 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Get Recc'd: A Book Recommendation System")
+st.title(
+    "Get Recc'd: A Book Recommendation System"
+)
 
 st.write(
     "Enter a favorite book to receive similar recommendations."
@@ -69,18 +77,13 @@ favorite_book = st.selectbox(
     placeholder="Select a book..."
 )
 
-# recommendation_count = st.slider(
-#    "Number of Recommendations",
-#    min_value=1,
-#    max_value=10,
-#    value=5
-#)
-
 # ============================================================
-# Request
+# Recommendation Request
 # ============================================================
 
-if st.button("Get Recommendations"):
+if st.button(
+    "Get Recommendations"
+):
 
     if not favorite_book:
 
@@ -95,8 +98,10 @@ if st.button("Get Recommendations"):
             response = requests.post(
                 f"{API_URL}/predict",
                 json={
-                    "favorite_book": favorite_book,
-                    "n_recommendations": 5 # recommendation_count
+                    "favorite_book":
+                        favorite_book,
+                    "n_recommendations":
+                        5
                 },
                 timeout=30
             )
@@ -105,66 +110,16 @@ if st.button("Get Recommendations"):
 
                 result = response.json()
 
-                st.success(
-                    f"Recommendations based on "
-                    f"'{favorite_book}'"
+                st.session_state[
+                    "favorite_book"
+                ] = favorite_book
+
+                st.session_state[
+                    "recommendations"
+                ] = result.get(
+                    "recommendations",
+                    []
                 )
-
-                recommendations = (
-                    result["recommendations"]
-                )
-
-                if not recommendations:
-
-                    st.warning(
-                        "No recommendations found."
-                    )
-
-                for recommendation in recommendations:
-
-                    title = recommendation.get(
-                        "title",
-                        "Unknown Title"
-                    )
-
-                    author = recommendation.get(
-                        "author",
-                        "Unknown Author"
-                    )
-
-                    image = recommendation.get(
-                        "image"
-                    )
-
-                    col1, col2 = st.columns(
-                        [1, 4]
-                    )
-
-                    with col1:
-
-                        if image:
-
-                            st.image(
-                                image,
-                                width=100
-                            )
-
-                        else:
-
-                            st.image(
-                                str(DEFAULT_IMAGE),
-                                width=100
-                            )
-
-                    with col2:
-
-                        st.subheader(title)
-
-                        st.write(
-                            f"Author: {author}"
-                        )
-
-                    st.divider()
 
             elif response.status_code == 404:
 
@@ -190,3 +145,144 @@ if st.button("Get Recommendations"):
         except Exception as e:
 
             st.error(str(e))
+
+# ============================================================
+# Display Recommendations
+# ============================================================
+
+recommendations = (
+    st.session_state[
+        "recommendations"
+    ]
+)
+
+selected_book = (
+    st.session_state[
+        "favorite_book"
+    ]
+)
+
+if recommendations:
+
+    st.success(
+        f"Recommendations based on "
+        f"'{selected_book}'"
+    )
+
+    for recommendation in recommendations:
+
+        title = recommendation.get(
+            "title",
+            "Unknown Title"
+        )
+
+        author = recommendation.get(
+            "author",
+            "Unknown Author"
+        )
+
+        image = recommendation.get(
+            "image"
+        )
+
+        col1, col2 = st.columns(
+            [1, 4]
+        )
+
+        with col1:
+
+            if image:
+
+                st.image(
+                    image,
+                    width=100
+                )
+
+            else:
+
+                st.image(
+                    str(DEFAULT_IMAGE),
+                    width=100
+                )
+
+        with col2:
+
+            st.subheader(title)
+
+            st.write(
+                f"Author: {author}"
+            )
+
+        st.divider()
+
+    # ========================================================
+    # Feedback Section
+    # ========================================================
+
+    st.subheader(
+        "Recommendation Feedback"
+    )
+
+    st.write(
+        "Were these recommendations helpful?"
+    )
+
+    feedback = st.radio(
+        "Feedback",
+        [
+            "positive",
+            "negative"
+        ],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+
+    if st.button(
+        "Submit Feedback"
+    ):
+
+        try:
+
+            feedback_payload = {
+
+                "favorite_book":
+                    selected_book,
+
+                "feedback":
+                    feedback,
+
+                "recommendation_count":
+                    len(
+                        recommendations
+                    )
+            }
+
+            response = requests.post(
+                f"{API_URL}/feedback",
+                json=feedback_payload,
+                timeout=10
+            )
+
+            if response.ok:
+
+                st.success(
+                    "Feedback submitted."
+                )
+
+            else:
+
+                st.error(
+                    "Unable to submit feedback."
+                )
+
+        except requests.exceptions.ConnectionError:
+
+            st.error(
+                "Unable to connect to FastAPI."
+            )
+
+        except Exception as e:
+
+            st.error(
+                str(e)
+            )

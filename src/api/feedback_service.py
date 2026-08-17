@@ -7,11 +7,11 @@ provider = (
 if provider == "dynamodb":
 
     from src.api.storage.dynamodb_storage import (
-        log_prediction
+        save_feedback
     )
 
 else:
 
     from src.api.storage.local_storage import (
-        log_prediction
+        save_feedback
     )

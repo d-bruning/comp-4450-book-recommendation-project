@@ -6,8 +6,14 @@ provider = (
 
 if provider == "dynamodb":
 
-    pass
+    from src.api.storage.dynamodb_storage import (
+        cache_prediction,
+        get_cached_prediction
+    )
 
 else:
 
-    pass
+    from src.api.storage.local_storage import (
+        cache_prediction,
+        get_cached_prediction
+    )

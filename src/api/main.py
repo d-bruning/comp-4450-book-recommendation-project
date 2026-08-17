@@ -3,7 +3,8 @@ from fastapi import FastAPI, HTTPException
 from src.api.cache_service import cache_prediction, get_cached_prediction
 from src.api.logging_service import log_prediction
 from src.api.recommender import get_recommendations
-from src.api.schemas import RecommendationRequest, RecommendationResponse
+from src.api.schemas import RecommendationRequest, RecommendationResponse, FeedbackRequest, FeedbackResponse
+from src.api.feedback_service import save_feedback
 
 app = FastAPI(
     title="Book Recommender API",
@@ -71,4 +72,22 @@ def predict(
             request.favorite_book,
         "recommendations":
             recommendations
+    }
+
+@app.post(
+    "/feedback",
+    response_model=FeedbackResponse
+)
+def submit_feedback(
+    request: FeedbackRequest
+):
+
+    save_feedback(
+        request.favorite_book,
+        request.feedback,
+        request.recommendation_count
+    )
+
+    return {
+        "status": "recorded"
     }

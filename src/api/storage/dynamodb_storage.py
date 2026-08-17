@@ -1,7 +1,8 @@
+import boto3
 import uuid
 from datetime import datetime, timezone
 
-import boto3
+
 
 dynamodb = boto3.resource(
     "dynamodb",
@@ -14,6 +15,10 @@ prediction_table = dynamodb.Table(
 
 cache_table = dynamodb.Table(
     "recommendation-cache"
+)
+
+feedback_table = dynamodb.Table(
+    "recommendation-feedback"
 )
 
 
@@ -88,3 +93,45 @@ def cache_prediction(
                 recommendations
         }
     )
+
+def save_feedback(
+    favorite_book: str,
+    feedback: str,
+    recommendation_count: int
+):
+
+    feedback_table.put_item(
+        Item={
+            "feedback_id": str(uuid.uuid4()),
+            "favorite_book": favorite_book,
+            "feedback": feedback,
+            "recommendation_count": recommendation_count,
+            "timestamp": (
+                datetime.now(timezone.utc)
+                .isoformat()
+            )
+        }
+    )
+
+
+def load_feedback():
+
+    response = feedback_table.scan()
+
+    items = response.get(
+        "Items",
+        []
+    )
+
+    if not items:
+        return pd.DataFrame()
+
+    df = pd.DataFrame(items)
+
+    if "timestamp" in df.columns:
+
+        df["timestamp"] = pd.to_datetime(
+            df["timestamp"]
+        )
+
+    return df

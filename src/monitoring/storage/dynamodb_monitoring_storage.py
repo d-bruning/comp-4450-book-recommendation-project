@@ -18,6 +18,10 @@ cache_table = dynamodb.Table(
     "recommendation-cache"
 )
 
+feedback_table = dynamodb.Table(
+    "recommendation-feedback"
+)
+
 # ============================================================
 # Prediction Logs
 # ============================================================
@@ -34,9 +38,12 @@ def load_prediction_logs():
         )
 
         if not records:
+
             return pd.DataFrame()
 
-        df = pd.DataFrame(records)
+        df = pd.DataFrame(
+            records
+        )
 
         if "timestamp" in df.columns:
 
@@ -54,7 +61,6 @@ def load_prediction_logs():
 
         return pd.DataFrame()
 
-
 # ============================================================
 # Cache
 # ============================================================
@@ -71,11 +77,13 @@ def load_cache():
         )
 
         return {
+
             item["favorite_book"]:
                 item.get(
                     "recommendations",
                     []
                 )
+
             for item in items
         }
 
@@ -86,3 +94,42 @@ def load_cache():
         )
 
         return {}
+
+# ============================================================
+# Feedback
+# ============================================================
+
+def load_feedback():
+
+    try:
+
+        response = feedback_table.scan()
+
+        records = response.get(
+            "Items",
+            []
+        )
+
+        if not records:
+
+            return pd.DataFrame()
+
+        df = pd.DataFrame(
+            records
+        )
+
+        if "timestamp" in df.columns:
+
+            df["timestamp"] = pd.to_datetime(
+                df["timestamp"]
+            )
+
+        return df
+
+    except Exception as e:
+
+        print(
+            f"Failed to load feedback: {e}"
+        )
+
+        return pd.DataFrame()
