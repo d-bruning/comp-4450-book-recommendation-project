@@ -1,6 +1,10 @@
-from src.api.config import USE_DYNAMODB
+from src.config.loader import config
 
-if USE_DYNAMODB:
+provider = (
+    config["storage"]["provider"]
+)
+
+if provider == "dynamodb":
 
     from src.api.storage.dynamodb_storage import (
         get_cached_prediction,

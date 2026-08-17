@@ -50,3 +50,6 @@ wandb/
 # logs
 logs/*.jsonl
 logs/*.json
+
+#AWS
+*.pem
