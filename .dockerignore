@@ -24,6 +24,9 @@ data/raw/Books_rating.csv
 # Training data
 data/processed/*.csv
 
+# Runtime metadata required by API
+!data/processed/books_metadata.csv
+
 # Training artifacts not needed in runtime containers
 artifacts/
 
