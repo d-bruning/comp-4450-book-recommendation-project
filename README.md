@@ -431,50 +431,249 @@ The dashboard reads local JSON files in development and DynamoDB in production.
 
 # Screenshots and Evidence
 
+This section provides visual evidence of the major components of the system, including application functionality, API validation, monitoring, cloud deployment, database integration, CI/CD automation, and MLOps tooling.
+
+---
+
 ## Frontend
 
-- docs/screenshots/app_1.jpg
-- docs/screenshots/app_2.jpg
-- docs/screenshots/aws_frontend_app_verify.jpg
+### Local Application Interface
+
+The initial Streamlit user interface running in a local development environment.
+
+<img src="docs/screenshots/app_1.jpg" alt="Local Streamlit application interface" width="500" />
+
+### Recommendation Results
+
+Example recommendation output displaying recommended books, author metadata, and cover images.
+
+<img src="docs/screenshots/app_2.jpg" alt="Recommendation results with metadata and images" width="500" />
+
+### AWS Frontend Deployment Verification
+
+The Streamlit frontend successfully deployed and accessible from the AWS EC2 application instance.
+
+<img src="docs/screenshots/aws_frontend_app_verify.jpg" alt="AWS deployed frontend application" width="500" />
+
+---
 
 ## API
 
-- docs/screenshots/swagger_docs.jpg
-- docs/screenshots/api_health.jpg
-- docs/screenshots/api_predict.jpg
+### Swagger API Documentation
+
+Interactive FastAPI documentation generated automatically through OpenAPI.
+
+<img src="docs/screenshots/swagger_docs.jpg" alt="FastAPI Swagger documentation" width="500" />
+
+### Health Endpoint Verification
+
+Verification that the FastAPI service is healthy and responding to requests.
+
+<img src="docs/screenshots/api_health.jpg" alt="FastAPI health endpoint response" width="500" />
+
+### Recommendation Endpoint Testing
+
+Successful execution of the prediction endpoint.
+
+<img src="docs/screenshots/api_predict.jpg" alt="FastAPI recommendation endpoint test" width="500" />
+
+---
 
 ## Monitoring
 
-- docs/screenshots/monitoring_1.jpg
-- docs/screenshots/monitoring_2.jpg
-- docs/screenshots/app_dynamo_monitoring.jpg
+### Local Monitoring Dashboard
+
+Initial monitoring dashboard implementation using locally persisted JSON logs.
+
+<img src="docs/screenshots/monitoring_1.jpg" alt="Local monitoring dashboard" width="500" />
+
+### Monitoring Metrics Visualization
+
+Operational metrics, request tracking, and cache analytics during development.
+
+<img src="docs/screenshots/monitoring_2.jpg" alt="Monitoring metrics and analytics" width="500" />
+
+### DynamoDB Production Monitoring
+
+Monitoring dashboard deployed to AWS and reading production metrics directly from DynamoDB.
+
+<img src="docs/screenshots/app_dynamo_monitoring.jpg" alt="Production monitoring dashboard using DynamoDB" width="500" />
+
+---
 
 ## Docker
 
-- docs/screenshots/docker_ps.jpg
-- docs/screenshots/docker_compose_verify.jpg
+### Docker Compose Verification
+
+Container orchestration configuration and deployment verification.
+
+<img src="docs/screenshots/docker_compose_verify.jpg" alt="Docker Compose deployment verification" width="500" />
+
+### Running Containers
+
+Verification that API, Frontend, and Monitoring containers are successfully running.
+
+<img src="docs/screenshots/docker_ps.jpg" alt="Running Docker containers" width="500" />
+
+---
 
 ## DynamoDB
 
-- docs/screenshots/dynamo_setup_1.jpg
-- docs/screenshots/dynamo_table_list.jpg
-- docs/screenshots/aws_cache_evidence.jpg
-- docs/screenshots/aws_dynamo_console.jpg
+### DynamoDB Configuration
 
-## AWS
+Initial DynamoDB setup and table creation.
 
-- docs/screenshots/aws_ec2_frontend_instance.jpg
-- docs/screenshots/aws_ec2_monitoring_instance.jpg
+<img src="docs/screenshots/dynamo_setup_1.jpg" alt="DynamoDB setup configuration" width="500" />
+
+### DynamoDB Tables
+
+Verification of the deployed DynamoDB tables.
+
+<img src="docs/screenshots/dynamo_table_list.jpg" alt="DynamoDB table listing" width="500" />
+
+### Recommendation Cache Evidence
+
+Evidence of cached recommendation results being persisted to DynamoDB.
+
+<img src="docs/screenshots/aws_cache_evidence.jpg" alt="DynamoDB recommendation cache records" width="500" />
+
+### Prediction History Evidence
+
+Evidence of prediction requests being logged to DynamoDB.
+
+<img src="docs/screenshots/aws_dynamo_console.jpg" alt="DynamoDB prediction history records" width="500" />
+
+---
+
+## AWS Deployment
+
+### Application EC2 Instance
+
+Application infrastructure hosting the FastAPI API and Streamlit frontend.
+
+<img src="docs/screenshots/aws_ec2_frontend_instance.jpg" alt="AWS EC2 application instance" width="500" />
+
+### Monitoring EC2 Instance
+
+Dedicated monitoring infrastructure hosting the operational dashboard.
+
+<img src="docs/screenshots/aws_ec2_monitoring_instance.jpg" alt="AWS EC2 monitoring instance" width="500" />
+
+---
 
 ## CI/CD
 
-- docs/screenshots/cicd.jpg
+### GitHub Actions Pipeline
 
-## W&B and MLflow
+Successful execution of the automated CI/CD workflow including validation and testing.
 
-- docs/screenshots/wandb_experiments.jpg
-- docs/screenshots/wandb_registry.jpg
-- docs/screenshots/mlflow_experiment_knn.jpg
+<img src="docs/screenshots/cicd.jpg" alt="GitHub Actions CI/CD pipeline" width="500" />
+
+---
+
+## Weights & Biases (W&B)
+
+### Experiment Tracking
+
+Experiment comparison, evaluation metrics, and model development tracking.
+
+<img src="docs/screenshots/wandb_experiments.jpg" alt="Weights and Biases experiment tracking" width="500" />
+
+### Model Registry
+
+Model registry showing tracked and versioned recommendation models.
+
+<img src="docs/screenshots/wandb_registry.jpg" alt="Weights and Biases model registry" width="500" />
+
+---
+
+## MLflow
+
+### KNN Experiment Tracking
+
+MLflow experiment tracking for recommendation model training and evaluation.
+
+<img src="docs/screenshots/mlflow_experiment_knn.jpg" alt="MLflow KNN experiment tracking" width="500" />
+
+---
+
+## DynamoDB
+
+### DynamoDB Configuration
+
+Initial DynamoDB setup and table creation.
+
+<img src="docs/screenshots/dynamo_setup_1.jpg" width="500" alt="">
+
+### DynamoDB Tables
+
+Verification of the deployed DynamoDB tables.
+
+<img src="docs/screenshots/dynamo_table_list.jpg" width="500" alt="">
+
+### Recommendation Cache Evidence
+
+Evidence of cached recommendation results being persisted to DynamoDB.
+
+<img src="docs/screenshots/aws_cache_evidence.jpg" width="500" alt="">
+
+### Prediction History Evidence
+
+Evidence of prediction requests being logged to DynamoDB.
+
+<img src="docs/screenshots/aws_dynamo_console.jpg" width="500" alt="">
+
+---
+
+## AWS Deployment
+
+### Application EC2 Instance
+
+Application infrastructure hosting the FastAPI API and Streamlit frontend.
+
+<img src="docs/screenshots/aws_ec2_frontend_instance.jpg" width="500" alt="">
+
+### Monitoring EC2 Instance
+
+Dedicated monitoring infrastructure hosting the operational dashboard.
+
+<img src="docs/screenshots/aws_ec2_monitoring_instance.jpg" width="500" alt="">
+
+---
+
+## CI/CD
+
+### GitHub Actions Pipeline
+
+Successful execution of the automated CI/CD workflow including validation and testing.
+
+<img src="docs/screenshots/cicd.jpg" width="500" alt="">
+
+---
+
+## Weights & Biases (W&B)
+
+### Experiment Tracking
+
+Experiment comparison, evaluation metrics, and model development tracking.
+
+<img src="docs/screenshots/wandb_experiments.jpg" width="500" alt="">
+
+### Model Registry
+
+Model registry showing tracked and versioned recommendation models.
+
+<img src="docs/screenshots/wandb_registry.jpg" width="500" alt="">
+
+---
+
+## MLflow
+
+### KNN Experiment Tracking
+
+MLflow experiment tracking for recommendation model training and evaluation.
+
+<img src="docs/screenshots/mlflow_experiment_knn.jpg" width="500" alt="">
 
 ---
 
@@ -574,12 +773,16 @@ Testing:
 
 ✅ End-to-End Production Workflow
 
+---
+
 # Author
 Daniel Bruning
 
 Lead Applications Developers
 
 University of Denver Information Technology
+
+---
 
 # AI Transparency Note
 CoPilot was used to edit and format this document.
