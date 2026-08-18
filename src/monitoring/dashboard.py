@@ -1,16 +1,35 @@
 import pandas as pd
 import streamlit as st
 
-from src.monitoring.monitoring_service import (
-    load_cache,
-    load_feedback,
-    load_prediction_logs
-)
+from src.monitoring.monitoring_service import load_cache, load_feedback, load_prediction_logs
+
+# ============================================================
+# Monitoring Dashboard
+# ============================================================
+#
+# Streamlit-based operational monitoring dashboard for the
+# Book Recommendation System.
+#
+# Responsibilities:
+# - Monitor prediction activity
+# - Monitor cache effectiveness
+# - Monitor user feedback
+# - Visualize recommendation usage patterns
+# - Provide operational insights for both
+#   development and production deployments
+#
+# Data Sources:
+# - Local JSON storage (development)
+# - DynamoDB (production)
+#
+# ============================================================
 
 # ============================================================
 # Load Data
 # ============================================================
 
+# Load operational data through the monitoring service abstraction. Storage
+# providers are selected automatically based on environment configuration.
 log_df = load_prediction_logs()
 
 cache_data = load_cache()
@@ -21,6 +40,8 @@ feedback_df = load_feedback()
 # Page
 # ============================================================
 
+# Configure the monitoring dashboard layout
+# and presentation settings.
 st.set_page_config(
     page_title="Monitoring Dashboard",
     page_icon="📈",
@@ -36,7 +57,15 @@ st.write(
 )
 
 # ============================================================
-# Metrics
+# Prediction Metrics
+# ============================================================
+#
+# Operational metrics derived from historical
+# recommendation requests.
+#
+# These metrics provide visibility into usage
+# volume, content popularity, and cache behavior.
+#
 # ============================================================
 
 total_predictions = (
@@ -53,6 +82,8 @@ unique_books = (
 
 cache_entries = len(cache_data)
 
+# Cache metrics help evaluate whether previously # generated recommendations are
+# being reused effectively.
 cache_hits = 0
 
 cache_hit_rate = 0
@@ -87,7 +118,15 @@ if not log_df.empty:
     )
 
 # ============================================================
-# Feedback Metrics
+# User Feedback Metrics
+# ============================================================
+#
+# User-submitted recommendation feedback is used # as a live quality indicator
+# for recommendation usefulness in production.
+#
+# Positive Feedback Rate serves as a recommendation quality metric analogous to
+# live model accuracy.
+#
 # ============================================================
 
 total_feedback = (
@@ -123,6 +162,7 @@ if not feedback_df.empty:
 # KPI Metrics
 # ============================================================
 
+# High-level operational health metrics.
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
@@ -153,6 +193,7 @@ with col4:
         cache_entries
     )
 
+# Recommendation quality and user engagement metrics.
 col5, col6, col7 = st.columns(3)
 
 with col5:
@@ -180,6 +221,8 @@ with col7:
 # Prediction Volume
 # ============================================================
 
+# Visualize recommendation request activity over # time to identify usage
+# trends and workload patterns.
 st.subheader(
     "Prediction Volume"
 )
@@ -222,6 +265,8 @@ else:
 # Most Requested Books
 # ============================================================
 
+# Display the most frequently requested books # to help identify
+# recommendation demand trends.
 st.subheader(
     "Top Requested Books"
 )
@@ -248,6 +293,8 @@ else:
 # Feedback Distribution
 # ============================================================
 
+# Visualize positive versus negative recommendation # feedback collected
+# from application users.
 st.subheader(
     "User Feedback Distribution"
 )
@@ -273,6 +320,7 @@ else:
 # Cache Summary
 # ============================================================
 
+# Display recommendation cache contents and # cache size statistics.
 st.subheader(
     "Cache Summary"
 )
@@ -307,6 +355,8 @@ else:
 # Recent Requests
 # ============================================================
 
+# Display recently processed recommendation # requests for
+# operational troubleshooting.
 st.subheader(
     "Recent Requests"
 )
@@ -365,6 +415,8 @@ else:
 # Recent Feedback
 # ============================================================
 
+# Display recently submitted user feedback # records to support
+# recommendation quality analysis.
 st.subheader(
     "Recent Feedback"
 )
@@ -394,6 +446,8 @@ else:
 # Raw Log Data
 # ============================================================
 
+# Optional raw data inspection section for # debugging and
+# operational verification.
 with st.expander(
     "View Raw Prediction Logs"
 ):

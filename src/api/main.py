@@ -11,6 +11,9 @@ app = FastAPI(
     version="1.0"
 )
 
+# ============================================================
+# API Health Endpoint
+# ============================================================
 
 @app.get("/health")
 def health_check():
@@ -19,18 +22,25 @@ def health_check():
         "status": "healthy"
     }
 
+# ============================================================
+# Prediction Endpoint
+# ============================================================
 
 @app.post(
     "/predict",
     response_model=RecommendationResponse
 )
 def predict(
+    # Generate recommendations using
+    # the production recommendation model.
     request: RecommendationRequest
 ):
     cached = get_cached_prediction(
         request.favorite_book
     )
-
+    # Check for previously generated
+    # recommendations before running
+    # model inference.
     if cached is not None:
 
         log_prediction(
@@ -51,6 +61,8 @@ def predict(
         request.n_recommendations
     )
 
+    # Persist request activity for
+    # monitoring and usage analysis.
     log_prediction(
         request.favorite_book,
         recommendations
@@ -74,6 +86,11 @@ def predict(
             recommendations
     }
 
+
+# ============================================================
+# Feedback Endpoint
+# ============================================================
+
 @app.post(
     "/feedback",
     response_model=FeedbackResponse
@@ -81,7 +98,10 @@ def predict(
 def submit_feedback(
     request: FeedbackRequest
 ):
-
+    """
+    Persist user feedback on recommendation quality.
+    Feedback is used to calculate live recommendation usefulness metrics within the monitoring dashboard.
+    """
     save_feedback(
         request.favorite_book,
         request.feedback,
