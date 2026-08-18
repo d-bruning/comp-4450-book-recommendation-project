@@ -1,7 +1,10 @@
 import pandas as pd
 import streamlit as st
 
-from src.monitoring.monitoring_service import load_cache, load_feedback, load_prediction_logs
+from src.monitoring.monitoring_service import (
+    load_cache,
+    load_feedback,
+    load_prediction_logs)
 
 # ============================================================
 # Monitoring Dashboard

@@ -3,7 +3,11 @@ from fastapi import FastAPI, HTTPException
 from src.api.cache_service import cache_prediction, get_cached_prediction
 from src.api.logging_service import log_prediction
 from src.api.recommender import get_recommendations
-from src.api.schemas import RecommendationRequest, RecommendationResponse, FeedbackRequest, FeedbackResponse
+from src.api.schemas import (
+    RecommendationRequest,
+    RecommendationResponse,
+    FeedbackRequest,
+    FeedbackResponse)
 from src.api.feedback_service import save_feedback
 
 app = FastAPI(
@@ -100,7 +104,8 @@ def submit_feedback(
 ):
     """
     Persist user feedback on recommendation quality.
-    Feedback is used to calculate live recommendation usefulness metrics within the monitoring dashboard.
+    Feedback is used to calculate live recommendation usefulness metrics within
+    the monitoring dashboard.
     """
     save_feedback(
         request.favorite_book,

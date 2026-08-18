@@ -1,8 +1,7 @@
 import boto3
 import uuid
+import pandas as pd
 from datetime import datetime, timezone
-
-
 
 dynamodb = boto3.resource(
     "dynamodb",
