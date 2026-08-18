@@ -2,7 +2,7 @@
 
 ## Overview
 
-Get Recc'd is an end-to-end MLOps recommendation platform built with Scikit Learn, FastAPI, Streamlit, Docker, DynamoDB, AWS EC2, MLflow, Weights & Biases (W&B), GitHub Actions, and automated testing as a  course project to COMP 4450 Machine Learning Operations.
+Get Recc'd is an end-to-end MLOps recommendation platform built with Scikit Learn, FastAPI, Streamlit, Docker, DynamoDB, AWS EC2, MLflow, Weights & Biases (W&B), GitHub Actions, and automated testing as a course project to COMP 4450 Machine Learning Operations.
 
 The application allows users to select a favorite book and receive recommendations. The application includes:
 
@@ -17,11 +17,13 @@ The application allows users to select a favorite book and receive recommendatio
 - MLflow testing and model registry
 - GitHub Actions CI/CD
 
+And, yes, I'm aware it's not the most compelling of front ends at this stage.
+
 ---
 
 # Table of Contents
 
-1. Overview
+1. Dataset Selection
 2. Architecture
 3. Repository Structure
 4. Prerequisites
@@ -39,6 +41,41 @@ The application allows users to select a favorite book and receive recommendatio
 16. Screenshots
 17. Troubleshooting
 18. Technology Stack
+
+---
+
+## Dataset Selection
+
+### Dataset Source
+
+This project uses the Amazon Books Reviews dataset curated by Mohamed Bakhet and published on Kaggle:
+
+https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews
+
+### Dataset Description
+
+The dataset contains book metadata and user review interactions collected from Amazon's Books category. It includes book titles, authors, ratings, and user review activity that can be used to construct recommendation systems based on user preferences and historical interactions.
+
+### Why This Dataset Was Chosen
+
+This dataset was selected for several reasons:
+
+* It contains real-world user interaction data suitable for collaborative filtering and recommendation system development.
+* User rating activity enables the construction of user-item interaction matrices required by recommendation algorithms such as K-Nearest Neighbors (KNN).
+* The dataset aligned directly with the project objective of building a personalized book recommendation system.
+* The size of the dataset is large enough to support meaningful experimentation, model evaluation, and production deployment while remaining manageable within the course project constraints.
+
+### Data Preparation
+
+Several preprocessing steps were performed before model training:
+
+* Data cleaning and quality validation
+* Removal of incomplete records
+* Creation of a filtered 5-core dataset to improve interaction density
+* Construction of a user-book interaction matrix
+* Extraction and enrichment of book metadata including author names and cover images
+
+These preprocessing steps improved recommendation quality and ensured the dataset was suitable for collaborative filtering techniques used by the production recommendation model.
 
 ---
 
@@ -77,21 +114,7 @@ Monitoring EC2 Instance
 
 ## Environment Configuration
 
-Development:
-
-```yaml
-storage:
-  provider: local
-```
-
-Production:
-
-```yaml
-storage:
-  provider: dynamodb
-```
-
-Configuration files:
+Configuration files for local testing:
 
 ```text
 src/config/
@@ -100,22 +123,302 @@ src/config/
 └── loader.py
 ```
 
+Development.yml:
+
+```yaml
+storage:
+  provider: local
+```
+
+production.yml:
+
+```yaml
+storage:
+  provider: dynamodb
+```
+
+Note: 
+docker-compose.yml overrides local src/config/loader.py config to assu
+
+## Container Architecture
+
+The application is deployed using a multi-container Docker architecture. Each major application component is isolated into its own container, allowing independent deployment, scaling, and maintenance.
+
+### Container Overview
+
+```text
+docker-compose.yml
+        │
+        ├── FastAPI API Container
+        ├── Streamlit Frontend Container
+        └── Streamlit Monitoring Container
+```
+
+This separation follows MLOps best practices by decoupling model serving, user interaction, and monitoring workloads.
+
+---
+
+## Docker Compose Configuration
+
+The `docker-compose.yml` file orchestrates the complete application stack and defines the relationships between containers.
+
+### Responsibilities
+
+* Builds container images
+* Starts application services
+* Configures environment variables
+* Exposes required ports
+* Manages inter-container communication
+* Enables environment-specific deployment behavior
+
+### Services
+
+#### API Service
+
+Provides model inference and backend business logic.
+
+```text
+Port: 8000
+Technology: FastAPI
+```
+
+#### Frontend Service
+
+Provides the user-facing recommendation interface.
+
+```text
+Port: 8501
+Technology: Streamlit
+```
+
+#### Monitoring Service
+
+Provides operational monitoring and recommendation quality analytics.
+
+```text
+Port: 8502
+Technology: Streamlit
+```
+
+### Environment Configuration
+
+Production deployments specify:
+
+```yaml
+environment:
+  ENVIRONMENT: production
+```
+
+This automatically enables:
+
+```text
+DynamoDB storage
+Production model configuration
+AWS monitoring integration
+```
+
+while development deployments use:
+
+```yaml
+environment:
+  ENVIRONMENT: development
+```
+
+which enables local JSON persistence.
+
+### Verification
+
+Successful deployment can be verified using:
+
+```bash
+docker compose up -d
+
+docker ps
+```
+
+Reference:
+
+<img src="docs/screenshots/docker_compose_verify.jpg" alt="Docker Compose ker_ps.jpg" alt="Runninginer
+
+### Dockerfile.frontend
+
+The frontend container packages the Streamlit user interface and all dependencies required to interact with the recommendation API.
+
+### Responsibilities
+
+* Display recommendation interface
+* Send requests to FastAPI
+* Collect user feedback
+* Display recommendation metadata
+* Display cover images
+
+### Build Process
+
+The container:
+
+1. Uses a Python base image.
+2. Installs required dependencies.
+3. Copies application source code.
+4. Exposes Streamlit port 8501.
+5. Launches the Streamlit frontend application.
+
+### Startup Command
+
+```text
+streamlit run src/frontend/app.py
+```
+
+### Exposed Port
+
+```text
+8501
+```
+
+Users access the recommendation application through this container.
+
+Reference:
+
+<img src="docs/screenshots/aws_frontend_app_verify.jpg" alt="AWS deployed frontend applicationitoring
+
+The monitoring container packages the Streamlit operational dashboard used for production monitoring and recommendation quality analysis.
+
+### Responsibilities
+
+* Visualize prediction activity
+* Monitor cache effectiveness
+* Display recommendation request trends
+* Display user feedback metrics
+* Calculate Positive Feedback Rate
+
+### Build Process
+
+The container:
+
+1. Uses a Python base image.
+2. Installs monitoring dependencies.
+3. Copies application source code.
+4. Exposes Streamlit port 8502.
+5. Launches the monitoring dashboard.
+
+### Startup Command
+
+```text
+streamlit run src/monitoring/dashboard.py
+```
+
+### Exposed Port
+
+```text
+8502
+```
+
+The dashboard operates independently from the recommendation application and retrieves monitoring data from the configured storage provider.
+
+The chosen deployment architecture provides several MLOps advantages:
+
+* Separation of concerns between inference, user interaction, and monitoring.
+* Independent deployment and troubleshooting of services.
+* Consistent execution environments across development and production.
+* Simplified cloud deployment using Docker Compose.
+* Reduced configuration drift between local and AWS environments.
+* Improved maintainability and scalability.
+
+This architecture enables the complete recommendation platform to be deployed on AWS EC2 while maintaining parity between development and production environments.
+
+
 ---
 
 # Repository Structure
 
-```text
-src/
-├── api/
-├── frontend/
-├── monitoring/
-├── config/
-├── data/
-├── models/
-└── tests/
+## Repository Structure
 
-docs/
-└── screenshots/
+```text
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
+├── data/
+│   ├── raw/
+│   │   └── Source Goodreads datasets
+│   │
+│   └── processed/
+│       └── Cleaned and transformed datasets
+│
+├── docs/
+│   └── screenshots/
+│       └── Project evidence and deployment screenshots
+│
+├── logs/
+│   ├── prediction_logs.jsonl
+│   ├── recommendation_cache.json
+│   └── feedback_logs.jsonl
+│
+├── models/
+│   ├── item_knn_model.joblib
+│   └── book_index.joblib
+│
+├── src/
+│   ├── api/
+│   │   ├── main.py
+│   │   ├── recommender.py
+│   │   ├── schemas.py
+│   │   ├── cache_service.py
+│   │   ├── logging_service.py
+│   │   ├── feedback_service.py
+│   │   └── storage/
+│   │       ├── local_storage.py
+│   │       └── dynamodb_storage.py
+│   │
+│   ├── config/
+│   │   ├── development.yml
+│   │   ├── production.yml
+│   │   └── loader.py
+│   │
+│   ├── frontend/
+│   │   ├── app.py
+│   │   └── assets/
+│   │       └── default-book.svg
+│   │
+│   ├── monitoring/
+│   │   ├── dashboard.py
+│   │   ├── monitoring_service.py
+│   │   └── storage/
+│   │       ├── local_monitoring_storage.py
+│   │       └── dynamodb_monitoring_storage.py
+│   │
+│   ├── preprocessing/
+│       ├── breakdowns.py
+│       ├── data_5core_filter.py
+│       ├── data_5core_report.py
+│       ├── dataset_profile.py
+│       ├── metadata.py
+│       └── trimmer.py
+│   │
+│   └── training/
+│       ├── mlflow_utils.py
+│       ├── train_item_knn.py
+│       ├── train_item_knn_mlflow.py
+│       ├── train_popularity_baseline.py
+│       ├── train_popularity_baseline_mlflow.py
+│       ├── train_popularity_top100.py
+│       ├── validate_item_knn.py
+│       └── wandb_test.py
+│
+├── tests/
+│   ├── test_health.py
+│   ├── test_predict.py
+│   └── manual_test_recommender.py
+│
+├── Dockerfile.frontend
+├── Dockerfile.monitoring
+├── docker-compose.yml
+├── requirements.txt
+├── mlflow.db
+├── ruff.toml
+├── test_mlflow.py
+├── wandb_test.py
+└── README.md
 ```
 
 ---
